@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * @file
+ * Contains rusa_waivers.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function rusa_waivers_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the rusa_waivers module.
+    case 'help.page.rusa_waivers':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('SmartWaiver integration for RUSA') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function rusa_waivers_theme() {
+  return [
+    'rusa_waivers' => [
+      'render element' => 'children',
+    ],
+  ];
+}

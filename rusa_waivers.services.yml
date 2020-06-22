@@ -1,0 +1,6 @@
+services:
+  rusa_waivers.smartwaiver:
+    class: Drupal\rusa_waivers\EventSubscriber\RusaWaiversSubscriber
+    arguments: []
+    tags:
+      - { name: event_subscriber }

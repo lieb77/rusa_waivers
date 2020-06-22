@@ -1,0 +1,15 @@
+rusa_waivers.waivers:
+  path: '/rusa/waivers'
+  defaults:
+    _controller: '\Drupal\rusa_waivers\Controller\RusaWaiversController::waivers'
+    _title: 'Waivers'
+  requirements:
+    _permission: 'access content'
+rusa_waivers.incoming:
+  path: '/rusa/incoming'
+  defaults:
+    _controller: '\Drupal\rusa_waivers\Controller\RusaIncomingController::incoming'
+    _title: 'New Waiver'
+  requirements:
+    _permission: 'access content'
+
