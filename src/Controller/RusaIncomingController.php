@@ -5,6 +5,8 @@ namespace Drupal\rusa_waivers\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\rusa_api\RusaPermanents;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+
 
 /**
  * Class RusaIncomingController.
@@ -17,6 +19,8 @@ class RusaIncomingController extends ControllerBase {
      * @var \Drupal\smartwaiver\ClientInterface
      */
     protected $smartwaiverClient;
+ 	protected $entityTypeManager;
+	protected $currentUser;
 
     /**
      * {@inheritdoc}
@@ -24,6 +28,8 @@ class RusaIncomingController extends ControllerBase {
     public static function create(ContainerInterface $container) {
         $instance = parent::create($container);
         $instance->smartwaiverClient = $container->get('smartwaiver.client');
+		$instance->entityTypeManager = $container->get('entity_type.manager');
+		$instance->currentUser       = $container->get('current_user');
         return $instance;
     }
 
@@ -53,6 +59,22 @@ class RusaIncomingController extends ControllerBase {
         foreach ($fields as $field) {
             $cfields[$field['displayText']] = $field['value'];
         }
+        $pid =  $cfields['Perm #'];
+
+        // Convert the date
+        $date = strtotime($cfields['Date you want to ride']);
+        $date = date("Y-m-d", $date);
+
+		// Save the registration
+ 		$reg = \Drupal::entityTypeManager()->getStorage('rusa_perm_reg_ride')->create(
+            [
+                'field_date_of_ride'    => $date,
+                'field_perm_number'     => $pid,
+                'field_waiver_id'       => $wid, 
+                'field_rusa_member_id'  => $mid,
+            ]);
+        $reg->save();
+
 
         // Get the signature which is a base64 encoded PNG
         $img = $this->smartwaiverClient->get_signature($wid)->participantSignatures[0];
@@ -65,8 +87,8 @@ class RusaIncomingController extends ControllerBase {
             $waiver->lastName,
             $waiver->email,
             $waiver->tags[0],
-            $cfields['Perm #'],
-            $cfields['Date you want to ride'],
+            $pid,
+            $date,
             $this->t("<img src='" . $img . "' alt='signature' style='max-height: 75px;' />"),
         ];
 
