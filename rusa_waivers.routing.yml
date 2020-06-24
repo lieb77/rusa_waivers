@@ -8,8 +8,8 @@ rusa_waivers.waivers:
 rusa_waivers.incoming:
   path: '/rusa/incoming'
   defaults:
-    _controller: '\Drupal\rusa_waivers\Controller\RusaIncomingController::incoming'
-    _title: 'New Waiver'
+    _controller: '\Drupal\rusa_waivers\Controller\RusaWaiversController::incoming'
+    _title: 'Perm Ride Registration'
   requirements:
     _permission: 'access content'
 
