@@ -1,4 +1,14 @@
 <?php
+/**
+ * @file RusaWaiversController.php
+ *
+ * Author: Paul Lieberman
+ * Created: 6/12/2020
+ *
+ * RUSA Perm Registration - SmartWaiver integration
+ *
+ */
+
 
 namespace Drupal\rusa_waivers\Controller;
 
@@ -34,7 +44,6 @@ class RusaWaiversController extends ControllerBase {
 		$instance->currentUser       = $container->get('current_user');
         return $instance;
     }
-
 
     /**
      * Waivers.
@@ -107,6 +116,7 @@ class RusaWaiversController extends ControllerBase {
 
 		// Now we have the waiver
         $mid       = $waiver->tags[0];
+        $pid       = $waiver->tags[1];
         $fields    = $waiver->customWaiverFields;
 
          // Get the custom field data
@@ -114,18 +124,20 @@ class RusaWaiversController extends ControllerBase {
             $cfields[$field['displayText']] = $field['value'];
         }
 
-        $pid =  $cfields['Perm #'];
+        $wpid =  $cfields['Perm #'];
         $wmid = $cfields['RUSA #']; // RUSA # entered in waiver
 
-		// Make sure we have the right user
-		//if ($mid != $this->uinfo['mid']) {
-		//      $this->messenger()->addWarning($this->t('Current user is not the same as the person who signed the waiver'));
-		//      return;
-		//}
-		//elseif ($mid != $wmid) {
-		//      $this->messenger()->addWarning($this->t('RUSA # entered in waiver is not the same as the current user'));
-		//      return;
-		//}
+		// Make sure mid matches what we passed in the tags
+		if ($mid != $wmid) {
+            $this->messenger()->addWarning($this->t('RUSA # entered in waiver is not the same as the rider who submitted the form.'));
+            return $this->redirect('rusa_perm.reg',['user' => $this->currentUser->id()]);
+		}
+
+        // Make sure pid matches what we passed in the tags
+		if ($pid != $wpid) {
+            $this->messenger()->addWarning($this->t('Route # entered in waiver is not the same as what was entered in the form.'));
+            return $this->redirect('rusa_perm.reg',['user' => $this->currentUser->id()]);
+		}
 
 
         // Convert the date
