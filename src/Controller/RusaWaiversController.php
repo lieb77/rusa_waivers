@@ -113,20 +113,26 @@ class RusaWaiversController extends ControllerBase {
 		// The waiver may not be ready yet
 	    sleep(5);	
        	$waiver = $this->smartwaiverClient->waiver($wid);
-
+       	
 		// Now we have the waiver
-        $mid       = $waiver->tags[0];
-        $pid       = $waiver->tags[1];
+        $tags      = $waiver->tags[0];
         $fields    = $waiver->customWaiverFields;
+        $pfields   = $waiver->participants[0]['customParticipantFields'];
 
-         // Get the custom field data
+        [$mid, $pid] = explode(' ', $tags);
+
+
+        // Get the mid entered in participant info
+        foreach ($pfields as $field) {
+            $wmid = $field['value'];
+        }
+
+        // Get the custom field data
         foreach ($fields as $field) {
             $cfields[$field['displayText']] = $field['value'];
         }
-
-        $wpid =  $cfields['Perm #'];
-        $wmid = $cfields['RUSA #']; // RUSA # entered in waiver
-
+        $wpid = $cfields['Perm #'];
+     
 		// Make sure mid matches what we passed in the tags
 		if ($mid != $wmid) {
             $this->messenger()->addWarning($this->t('RUSA # entered in waiver is not the same as the rider who submitted the form.'));
